@@ -1,0 +1,66 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                    http://www.springframework.org/schema/security 
+                    http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+	<!-- We will be defining all security related configurations in this file -->
+	
+	<http pattern="/login" security="none" />
+
+	<http use-expressions="true">
+		<session-management>
+			<concurrency-control max-sessions="1" expired-url="/login" />
+		</session-management>
+		<intercept-url pattern="/login" access="permitAll" />
+		<intercept-url pattern="/new/user_reg**" access="permitAll" />
+		<intercept-url pattern="/forgotpass**" access="permitAll" />
+		<intercept-url pattern="/**" access="isAuthenticated()" />
+		<form-login login-page="/login" authentication-failure-url="/login" />
+		<logout logout-url="/logout" logout-success-url="/login"
+			invalidate-session="true" delete-cookies="JSESSIONID" /> 
+	<!-- 		
+			<port-mappings>
+				<port-mapping http="80" https="443"/>
+				<port-mapping http="8080" https="443"/>
+			</port-mappings> -->
+	</http>
+	
+	
+
+	<beans:bean id="daoAuthenticationProvider"
+		class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+		<!-- <beans:property name="passwordEncoder">
+			<beans:bean class="org.springframework.security.authentication.encoding.md5passwordencoder" id="passwordEncoder">
+				<beans:property name="iterations" value="1000" />
+			</beans:bean>
+		</beans:property>
+		<beans:property name="saltSource">
+			<beans:bean class="org.springframework.security.authentication.dao.ReflectionSaltSource">
+				<beans:property name="username" value="id" />
+			</beans:bean>
+		</beans:property> -->
+		<beans:property name="userDetailsService" ref="userDetailsService"></beans:property>
+	</beans:bean>
+
+	<beans:bean id="authenticationManager"
+		class="org.springframework.security.authentication.ProviderManager">
+		<beans:property name="providers">
+			<beans:list>
+				<beans:ref local="daoAuthenticationProvider" />
+			</beans:list>
+		</beans:property>
+	</beans:bean>
+
+	<authentication-manager>
+		<authentication-provider user-service-ref="userDetailsService">
+			<password-encoder ref="passwordEncoder"></password-encoder>
+		</authentication-provider>
+	</authentication-manager>
+	
+	<beans:bean id="passwordEncoder"
+  				xmlns="http://www.springframework.org/schema/beans"
+  				class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+	</beans:bean>
+</beans:beans>

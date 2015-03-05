@@ -1,0 +1,14 @@
+.topcorner {
+  margin-right:5px;
+  position:relative;
+  float:right;
+}
+
+.textheight{
+	line-height:25px;
+}
+
+ .spanClass{
+    float: left;
+    width: 113px;
+  }
